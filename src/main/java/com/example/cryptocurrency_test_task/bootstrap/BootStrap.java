@@ -1,6 +1,7 @@
 package com.example.cryptocurrency_test_task.bootstrap;
 
 import com.example.cryptocurrency_test_task.domain.Trade;
+import com.example.cryptocurrency_test_task.repositories.TradeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -20,13 +21,16 @@ import java.util.List;
 @Component
 public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
     private final RestTemplate restTemplate;
+    private final TradeRepository tradeRepository;
 
-    public BootStrap(RestTemplate restTemplate) {
+    public BootStrap(RestTemplate restTemplate, TradeRepository tradeRepository) {
         this.restTemplate = restTemplate;
+        this.tradeRepository = tradeRepository;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        tradeRepository.deleteAll();
         configureRestTemplate();
 
         storeBTCData();
@@ -39,8 +43,9 @@ public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
         final ResponseEntity<Trade[]> response = restTemplate
                 .getForEntity("https://cex.io/api/trade_history/BTC/USD", Trade[].class);
         List<Trade> tradeList = Arrays.asList(response.getBody());
-        tradeList.forEach(trade -> trade.setCurrency("BTC"));
-        tradeList.forEach(System.out::println);
+        tradeList.forEach(trade -> trade.setCurrency("USD"));
+        tradeList.forEach(trade -> trade.setCryptoCurrency("BTC"));
+        tradeRepository.saveAll(tradeList);
         log.info("======================================= Finish loading BTC/USD");
     }
 
@@ -49,8 +54,9 @@ public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
         final ResponseEntity<Trade[]> response = restTemplate
                 .getForEntity("https://cex.io/api/trade_history/ETH/USD", Trade[].class);
         List<Trade> tradeList = Arrays.asList(response.getBody());
-        tradeList.forEach(trade -> trade.setCurrency("ETH"));
-        tradeList.forEach(System.out::println);
+        tradeList.forEach(trade -> trade.setCurrency("USD"));
+        tradeList.forEach(trade -> trade.setCryptoCurrency("ETH"));
+        tradeRepository.saveAll(tradeList);
         log.info("======================================= Finish loading ETH/USD");
     }
 
@@ -59,8 +65,9 @@ public class BootStrap implements ApplicationListener<ContextRefreshedEvent> {
         final ResponseEntity<Trade[]> response = restTemplate
                 .getForEntity("https://cex.io/api/trade_history/XRP/USD", Trade[].class);
         List<Trade> tradeList = Arrays.asList(response.getBody());
-        tradeList.forEach(trade -> trade.setCurrency("XRP"));
-        tradeList.forEach(System.out::println);
+        tradeList.forEach(trade -> trade.setCurrency("USD"));
+        tradeList.forEach(trade -> trade.setCryptoCurrency("XRP"));
+        tradeRepository.saveAll(tradeList);
         log.info("======================================= Finish loading XRP/USD");
     }
 

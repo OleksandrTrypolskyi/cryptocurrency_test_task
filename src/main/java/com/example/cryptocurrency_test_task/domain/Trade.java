@@ -15,5 +15,6 @@ public class Trade {
     private String amount;
     private String price;
     private String date;
+    private String cryptoCurrency;
     private String currency;
 }
