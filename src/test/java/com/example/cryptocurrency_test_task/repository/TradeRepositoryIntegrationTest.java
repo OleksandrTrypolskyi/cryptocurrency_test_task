@@ -1,26 +1,15 @@
 package com.example.cryptocurrency_test_task.repository;
 
 import com.example.cryptocurrency_test_task.domain.Trade;
-import com.mongodb.client.MongoClients;
-import de.flapdoodle.embed.mongo.MongodExecutable;
-import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.ImmutableMongodConfig;
-import de.flapdoodle.embed.mongo.config.MongodConfig;
-import de.flapdoodle.embed.mongo.config.Net;
-import de.flapdoodle.embed.mongo.distribution.Version;
-import de.flapdoodle.embed.process.runtime.Network;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,17 +55,19 @@ class TradeRepositoryIntegrationTest {
 
     @Test
     void findTopByCryptoCurrencyOrderByPrice() {
-        assertThat(tradeRepository.findTopByCryptoCurrencyOrderByPrice("ETH").get().getId())
+        final Trade trade = tradeRepository.findTopByCryptoCurrencyOrderByPrice("ETH").get();
+        assertThat(trade.getId())
                 .isEqualTo(tradeWithMinPrice.getId());
-        assertThat(tradeRepository.findTopByCryptoCurrencyOrderByPrice("ETH").get().getPrice())
+        assertThat(trade.getPrice())
                 .isEqualTo(tradeWithMinPrice.getPrice());
     }
 
     @Test
     void findTopByCryptoCurrencyOrderByPriceDesc() {
-        assertThat(tradeRepository.findTopByCryptoCurrencyOrderByPriceDesc("ETH").get().getPrice())
+        final Trade trade = tradeRepository.findTopByCryptoCurrencyOrderByPriceDesc("ETH").get();
+        assertThat(trade.getPrice())
                 .isEqualTo(tradeWithMaxPrice.getPrice());
-        assertThat(tradeRepository.findTopByCryptoCurrencyOrderByPriceDesc("ETH").get().getId())
+        assertThat(trade.getId())
                 .isEqualTo(tradeWithMaxPrice.getId());
     }
 

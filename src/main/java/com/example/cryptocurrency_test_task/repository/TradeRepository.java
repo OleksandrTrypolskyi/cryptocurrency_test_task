@@ -1,7 +1,6 @@
 package com.example.cryptocurrency_test_task.repository;
 
 import com.example.cryptocurrency_test_task.domain.Trade;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 

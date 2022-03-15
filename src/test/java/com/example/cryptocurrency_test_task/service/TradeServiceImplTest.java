@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class TradeServiceImplTest {
 
     private TradeService tradeService;
-
     @Mock
     private TradeRepository tradeRepository;
     private List<Trade> trades;

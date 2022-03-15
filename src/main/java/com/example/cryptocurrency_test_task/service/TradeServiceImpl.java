@@ -3,9 +3,14 @@ package com.example.cryptocurrency_test_task.service;
 import com.example.cryptocurrency_test_task.domain.Trade;
 import com.example.cryptocurrency_test_task.repository.TradeRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -34,5 +39,26 @@ public class TradeServiceImpl implements TradeService {
     @Override
     public List<Trade> findByCryptoCurrencyIgnoreCaseOrderByPrice(String cryptoCurrency, Pageable pageable) {
         return tradeRepository.findByCryptoCurrencyIgnoreCaseOrderByPrice(cryptoCurrency, pageable);
+    }
+
+    @Override
+    public void generateCSVReport(HttpServletResponse response) {
+        String filename = "report.csv";
+        final List<String> cryptos = List.of("BTC", "ETH", "XRP");
+        try (CSVPrinter csvPrinter = new CSVPrinter(response.getWriter(),
+                CSVFormat.DEFAULT.withHeader("Name", "Min Price", "Max Price"))) {
+            response.setContentType("text/csv");
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + filename + "\"");
+            for(String cryptoCurrency : cryptos) {
+                String name = cryptoCurrency;
+                String minPrice = findTradeWithMinPriceByCryptoCurrency(cryptoCurrency).getPrice();
+                String maxPrice = findTradeWithMaxPriceByCryptoCurrency(cryptoCurrency).getPrice();
+                csvPrinter.printRecord(name, minPrice, maxPrice);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,16 +1,16 @@
 package com.example.cryptocurrency_test_task.controller;
 
 import com.example.cryptocurrency_test_task.domain.Trade;
-import com.example.cryptocurrency_test_task.repository.TradeRepository;
 import com.example.cryptocurrency_test_task.service.TradeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -40,6 +40,11 @@ public class TradeController {
     ) {
         return tradeService
                 .findByCryptoCurrencyIgnoreCaseOrderByPrice(cryptoCurrency, PageRequest.of(page, size));
+    }
+
+    @GetMapping("/csv")
+    public void generateCSVReport(HttpServletResponse httpServletResponse) {
+        tradeService.generateCSVReport(httpServletResponse);
     }
 
 
