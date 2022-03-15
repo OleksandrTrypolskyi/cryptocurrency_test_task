@@ -1,7 +1,7 @@
 package com.example.cryptocurrency_test_task.bootstrap;
 
 import com.example.cryptocurrency_test_task.domain.Trade;
-import com.example.cryptocurrency_test_task.repositories.TradeRepository;
+import com.example.cryptocurrency_test_task.repository.TradeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;

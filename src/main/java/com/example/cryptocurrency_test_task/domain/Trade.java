@@ -1,9 +1,6 @@
 package com.example.cryptocurrency_test_task.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,4 +19,15 @@ public class Trade {
     private String date;
     private String cryptoCurrency;
     private String currency;
+
+    //Builder for testing purposes
+    @Builder
+    public Trade(String type, String amount, String price,
+                 String cryptoCurrency, String currency) {
+        this.type = type;
+        this.amount = amount;
+        this.price = price;
+        this.cryptoCurrency = cryptoCurrency;
+        this.currency = currency;
+    }
 }
