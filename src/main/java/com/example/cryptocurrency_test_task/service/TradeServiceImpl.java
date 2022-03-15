@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 @Slf4j
 public class TradeServiceImpl implements TradeService {
     private final TradeRepository tradeRepository;
-    private final Set<String> cryptoCurrencies = Set.of("BTC", "ETH", "XRP");
 
     public TradeServiceImpl(TradeRepository tradeRepository) {
         this.tradeRepository = tradeRepository;
