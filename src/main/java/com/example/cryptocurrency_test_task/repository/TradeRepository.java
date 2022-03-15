@@ -10,5 +10,6 @@ import java.util.Optional;
 public interface TradeRepository extends MongoRepository<Trade, String> {
     Optional<Trade> findTopByCryptoCurrencyOrderByPrice(String cryptoCurrency);
     Optional<Trade> findTopByCryptoCurrencyOrderByPriceDesc(String cryptoCurrency);
-    List<Trade> findByCryptoCurrencyIgnoreCaseOrderByPrice(String cryptoCurrency, Pageable pageable);
+    Optional<List<Trade>> findByCryptoCurrencyIgnoreCaseOrderByPrice(String cryptoCurrency, Pageable pageable);
+
 }

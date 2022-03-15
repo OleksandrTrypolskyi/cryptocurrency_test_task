@@ -12,6 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -73,10 +74,10 @@ class TradeRepositoryIntegrationTest {
 
     @Test
     void findByCryptoCurrencyIgnoreCaseOrderByPrice() {
-        final List<Trade> trades = tradeRepository
-                .findByCryptoCurrencyIgnoreCaseOrderByPrice("ETH", PageRequest.of(0, 2));
-        assertThat(trades.get(0).getPrice()).isEqualTo(MIN_PRICE);
-        assertThat(trades.get(1).getPrice()).isEqualTo(AVG_PRICE);
-        assertThat(trades.size()).isEqualTo(2);
+        final List<Trade> tradesList = tradeRepository
+                .findByCryptoCurrencyIgnoreCaseOrderByPrice("ETH", PageRequest.of(0, 2)).get();
+        assertThat(tradesList.get(0).getPrice()).isEqualTo(MIN_PRICE);
+        assertThat(tradesList.get(1).getPrice()).isEqualTo(AVG_PRICE);
+        assertThat(tradesList.size()).isEqualTo(2);
     }
 }
