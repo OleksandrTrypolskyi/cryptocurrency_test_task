@@ -1,14 +1,16 @@
 package com.example.cryptocurrency_test_task.controller;
 
 import com.example.cryptocurrency_test_task.domain.Trade;
+import com.example.cryptocurrency_test_task.repository.TradeRepository;
 import com.example.cryptocurrency_test_task.service.TradeService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -16,19 +18,31 @@ import java.util.Comparator;
 public class TradeController {
     private final TradeService tradeService;
 
-    public TradeController(TradeService tradeRepository) {
-        this.tradeService = tradeRepository;
+    public TradeController(TradeService tradeService) {
+        this.tradeService = tradeService;
     }
 
     @GetMapping("/minprice")
-    public Trade getMinPrice(@RequestParam(name = "name") String cryptoCurrency) {
+    public Trade getTradeWithMinPriceByCryptoCurrency(@RequestParam(name = "name") String cryptoCurrency) {
         return tradeService.findTradeWithMinPriceByCryptoCurrency(cryptoCurrency);
     }
 
     @GetMapping("/maxprice")
-    public Trade getMaxPrice(@RequestParam(name = "name") String cryptoCurrency) {
+    public Trade getTradeWithMaxPriceByCryptoCurrency(@RequestParam(name = "name") String cryptoCurrency) {
         return tradeService.findTradeWithMaxPriceByCryptoCurrency(cryptoCurrency);
     }
+
+    @GetMapping
+    public List<Trade> getTradesByCryptoCurrencyPage(
+            @RequestParam(name = "name") String cryptoCurrency,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        return tradeService
+                .findByCryptoCurrencyIgnoreCaseOrderByPrice(cryptoCurrency, PageRequest.of(page, size));
+    }
+
+
 
 
 }

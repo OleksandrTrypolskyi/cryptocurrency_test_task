@@ -10,11 +10,13 @@ import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -27,25 +29,33 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @ExtendWith(SpringExtension.class)
 @DataMongoTest
 class TradeRepositoryIntegrationTest {
+    public static final String MIN_PRICE = "2049.5";
+    public static final String AVG_PRICE = "2549.5";
+    public static final String MAX_PRICE = "2949.5";
     @Autowired
     private TradeRepository tradeRepository;
 
     private List<Trade> trades;
-    private Trade tradeWithMinPrice;
+    public Trade tradeWithMinPrice;
     private Trade tradeWithMaxPrice;
 
     @BeforeEach
     void setUp(){
         trades = new ArrayList<>();
         trades.add(Trade.builder().type("sell").amount("0.5").
-                price("2549.5").cryptoCurrency("ETH").currency("USD").build());
+                price(AVG_PRICE).cryptoCurrency("ETH").currency("USD").build());
         tradeWithMinPrice = Trade.builder().type("sell").amount("0.6").
-                price("2049.5").cryptoCurrency("ETH").currency("USD").build();
+                price(MIN_PRICE).cryptoCurrency("ETH").currency("USD").build();
         trades.add(tradeWithMinPrice);
         tradeWithMaxPrice = Trade.builder().type("sell").amount("0.8").
-                price("2949.5").cryptoCurrency("ETH").currency("USD").build();
+                price(MAX_PRICE).cryptoCurrency("ETH").currency("USD").build();
         trades.add(tradeWithMaxPrice);
         tradeRepository.saveAll(trades);
+    }
+
+    @AfterEach
+    void tearDown() {
+        tradeRepository.deleteAll();
     }
 
     @Test
@@ -68,5 +78,14 @@ class TradeRepositoryIntegrationTest {
                 .isEqualTo(tradeWithMaxPrice.getPrice());
         assertThat(tradeRepository.findTopByCryptoCurrencyOrderByPriceDesc("ETH").get().getId())
                 .isEqualTo(tradeWithMaxPrice.getId());
+    }
+
+    @Test
+    void findByCryptoCurrencyIgnoreCaseOrderByPrice() {
+        final List<Trade> trades = tradeRepository
+                .findByCryptoCurrencyIgnoreCaseOrderByPrice("ETH", PageRequest.of(0, 2));
+        assertThat(trades.get(0).getPrice()).isEqualTo(MIN_PRICE);
+        assertThat(trades.get(1).getPrice()).isEqualTo(AVG_PRICE);
+        assertThat(trades.size()).isEqualTo(2);
     }
 }
