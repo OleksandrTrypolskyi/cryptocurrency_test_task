@@ -29,6 +29,13 @@ class TradeControllerTest {
 
     public static final String MIN_PRICE = "2049.5";
     public static final String MAX_PRICE = "2949.5";
+    public static final String EXCEPTION_MESSAGE = "Crypto currency ET is not supported." +
+            " Please use: 'BTC', 'ETH', 'XRP'.";
+    public static final String PLEASE_USE_BTC_ETH_XRP = "Please use: 'BTC', 'ETH', 'XRP'.";
+    public static final String CRYPTOCURRENCIES_API_V_1 = "/cryptocurrencies/api/v1/";
+    public static final String ETH = "ETH";
+    public static final String USD = "USD";
+    public static final String SELL = "sell";
     @Mock
     private TradeService tradeService;
     private TradeController tradeController;
@@ -43,10 +50,10 @@ class TradeControllerTest {
         tradeController = new TradeController(tradeService);
         mockMvc = MockMvcBuilders.standaloneSetup(tradeController)
                 .setControllerAdvice(new ControllerExceptionHandler()).build();
-        tradeWithMinPrice = Trade.builder().type("sell").amount("0.6").
-                price(MIN_PRICE).cryptoCurrency("ETH").currency("USD").build();
-        tradeWithMaxPrice = Trade.builder().type("sell").amount("0.8").
-                price(MAX_PRICE).cryptoCurrency("ETH").currency("USD").build();
+        tradeWithMinPrice = Trade.builder().type(SELL).amount("0.6").
+                price(MIN_PRICE).cryptoCurrency(ETH).currency(USD).build();
+        tradeWithMaxPrice = Trade.builder().type(SELL).amount("0.8").
+                price(MAX_PRICE).cryptoCurrency(ETH).currency(USD).build();
         trades = new ArrayList<>();
         trades.add(tradeWithMinPrice);
         trades.add(tradeWithMaxPrice);
@@ -59,7 +66,7 @@ class TradeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cryptoCurrency", is("ETH")))
+                .andExpect(jsonPath("$.cryptoCurrency", is(ETH)))
                 .andExpect(jsonPath("$.price", is(MIN_PRICE)));
         verify(tradeService, times(1)).findTradeWithMinPriceByCryptoCurrency(anyString());
     }
@@ -71,7 +78,7 @@ class TradeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cryptoCurrency", is("ETH")))
+                .andExpect(jsonPath("$.cryptoCurrency", is(ETH)))
                 .andExpect(jsonPath("$.price", is(MAX_PRICE)));
         verify(tradeService, times(1)).findTradeWithMaxPriceByCryptoCurrency(anyString());
     }
@@ -91,50 +98,47 @@ class TradeControllerTest {
     @Test
     void getTradeWithMinPriceByCryptoCurrencyThrowsExc() throws Exception {
         when(tradeService.findTradeWithMinPriceByCryptoCurrency(anyString()))
-                .thenThrow(new NotSupportedCurrencyException("Crypto currency ET is not supported." +
-                        " Please use: 'BTC', 'ETH', 'XRP'."));
+                .thenThrow(new NotSupportedCurrencyException(EXCEPTION_MESSAGE));
 
         mockMvc.perform(get("/cryptocurrencies/api/v1/minprice?name=ET")
                 .contentType(MediaType.APPLICATION_JSON)
                         .param("name", "ET"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message",
-                        containsString("Please use: 'BTC', 'ETH', 'XRP'.")));
+                        containsString(PLEASE_USE_BTC_ETH_XRP)));
     }
 
     @Test
     void getTradeWithMaxPriceByCryptoCurrencyThrowsExc() throws Exception {
         when(tradeService.findTradeWithMaxPriceByCryptoCurrency(anyString()))
-                .thenThrow(new NotSupportedCurrencyException("Crypto currency ET is not supported." +
-                        " Please use: 'BTC', 'ETH', 'XRP'."));
+                .thenThrow(new NotSupportedCurrencyException(EXCEPTION_MESSAGE));
 
         mockMvc.perform(get("/cryptocurrencies/api/v1/maxprice?name=ET")
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("name", "ET"))
                 .andExpect(status().isBadRequest())
                 .andExpect((ResultMatcher) jsonPath("$.message",
-                        containsString("Please use: 'BTC', 'ETH', 'XRP'.")));
+                        containsString(PLEASE_USE_BTC_ETH_XRP)));
     }
 
     @Test
     @DisplayName("findByCryptoCurrencyIgnoreCaseOrderByPrice() throws NotSupportedCurrencyException")
     void findByCryptoCurrencyIgnoreCaseOrderByPriceThrowsExc() throws Exception {
         when(tradeService.findByCryptoCurrencyIgnoreCaseOrderByPrice(anyString(), any()))
-                .thenThrow(new NotSupportedCurrencyException("Crypto currency ET is not supported." +
-                        " Please use: 'BTC', 'ETH', 'XRP'."));
+                .thenThrow(new NotSupportedCurrencyException(EXCEPTION_MESSAGE));
 
-        mockMvc.perform(get("/cryptocurrencies/api/v1/")
+        mockMvc.perform(get(CRYPTOCURRENCIES_API_V_1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("name", "ET"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message",
-                        containsString("Please use: 'BTC', 'ETH', 'XRP'.")));
+                        containsString(PLEASE_USE_BTC_ETH_XRP)));
     }
 
     @Test
     @DisplayName("findByCryptoCurrencyIgnoreCaseOrderByPrice() throws NumberFormatException")
     void findByCryptoCurrencyIgnoreCaseOrderByPriceThrowsNumbrExc() throws Exception {
-        mockMvc.perform(get("/cryptocurrencies/api/v1/")
+        mockMvc.perform(get(CRYPTOCURRENCIES_API_V_1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("name", "ET")
                         .param("page", "text"))

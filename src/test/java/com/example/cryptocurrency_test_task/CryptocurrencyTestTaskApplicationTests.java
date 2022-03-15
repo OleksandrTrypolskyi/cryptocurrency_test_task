@@ -12,11 +12,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest
 class CryptocurrencyTestTaskApplicationTests {
-
-
-	@Autowired
-	private TradeRepository tradeRepository;
-
 	@Test
 	void contextLoads() {
 	}

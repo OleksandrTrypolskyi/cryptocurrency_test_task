@@ -56,8 +56,8 @@ class TradeControllerIntegrationTest {
         tradeController = new TradeController(tradeService);
         mockMvc = MockMvcBuilders.standaloneSetup(tradeController).build();
 
-        btcTradeWithMinPrice = Trade.builder().price("10").cryptoCurrency("BTC").build();
-        btcTradeWithMaxPrice = Trade.builder().price("1000").cryptoCurrency("BTC").build();
+        btcTradeWithMinPrice = Trade.builder().price("10").cryptoCurrency(BTC).build();
+        btcTradeWithMaxPrice = Trade.builder().price("1000").cryptoCurrency(BTC).build();
 
         ethTradeWithMinPrice = Trade.builder().price("20").cryptoCurrency(ETH).build();
         ethTradeWithMaxPrice = Trade.builder().price("2000").cryptoCurrency(ETH).build();
@@ -73,6 +73,20 @@ class TradeControllerIntegrationTest {
                         "BTC,10,1000 \n" +
                         "ETH,20,2000 \n" +
                         "XRP,50,5000 \n";
+        setUpMockBehaviour();
+
+
+        final MvcResult mvcResult = mockMvc.perform(get("/cryptocurrencies/api/v1/csv"))
+                .andExpect(content().contentType("text/csv"))
+                .andExpect(header()
+                        .string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"report.csv\""))
+                .andExpect(status().isOk()).andReturn();
+
+        final String actualResult = mvcResult.getResponse().getContentAsString().replaceAll("\\s", "");
+        assertThat(actualResult).isEqualTo(expectedResult.replaceAll("\\s", ""));
+    }
+
+    private void setUpMockBehaviour() {
         when(tradeRepository.findTopByCryptoCurrencyOrderByPrice(BTC))
                 .thenReturn(Optional.of(btcTradeWithMinPrice));
         when(tradeRepository.findTopByCryptoCurrencyOrderByPriceDesc(BTC))
@@ -87,15 +101,5 @@ class TradeControllerIntegrationTest {
                 .thenReturn(Optional.of(xrpTradeWithMinPrice));
         when(tradeRepository.findTopByCryptoCurrencyOrderByPriceDesc(XRP))
                 .thenReturn(Optional.of(xrpTradeWithMaxPrice));
-
-
-        final MvcResult mvcResult = mockMvc.perform(get("/cryptocurrencies/api/v1/csv"))
-                .andExpect(content().contentType("text/csv"))
-                .andExpect(header()
-                        .string(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"report.csv\""))
-                .andExpect(status().isOk()).andReturn();
-
-        final String actualResult = mvcResult.getResponse().getContentAsString().replaceAll("\\s", "");
-        assertThat(actualResult).isEqualTo(expectedResult.replaceAll("\\s", ""));
     }
 }

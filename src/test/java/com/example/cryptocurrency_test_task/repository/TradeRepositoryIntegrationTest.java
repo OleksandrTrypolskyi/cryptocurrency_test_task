@@ -22,6 +22,9 @@ class TradeRepositoryIntegrationTest {
     public static final String MIN_PRICE = "2049.5";
     public static final String AVG_PRICE = "2549.5";
     public static final String MAX_PRICE = "2949.5";
+    public static final String ETH = "ETH";
+    public static final String USD = "USD";
+    public static final String TRADE_TYPE = "sell";
     @Autowired
     private TradeRepository tradeRepository;
 
@@ -32,13 +35,13 @@ class TradeRepositoryIntegrationTest {
     @BeforeEach
     void setUp(){
         trades = new ArrayList<>();
-        trades.add(Trade.builder().type("sell").amount("0.5").
-                price(AVG_PRICE).cryptoCurrency("ETH").currency("USD").build());
-        tradeWithMinPrice = Trade.builder().type("sell").amount("0.6").
-                price(MIN_PRICE).cryptoCurrency("ETH").currency("USD").build();
+        trades.add(Trade.builder().type(TRADE_TYPE).amount("0.5").
+                price(AVG_PRICE).cryptoCurrency(ETH).currency(USD).build());
+        tradeWithMinPrice = Trade.builder().type(TRADE_TYPE).amount("0.6").
+                price(MIN_PRICE).cryptoCurrency(ETH).currency(USD).build();
         trades.add(tradeWithMinPrice);
-        tradeWithMaxPrice = Trade.builder().type("sell").amount("0.8").
-                price(MAX_PRICE).cryptoCurrency("ETH").currency("USD").build();
+        tradeWithMaxPrice = Trade.builder().type(TRADE_TYPE).amount("0.8").
+                price(MAX_PRICE).cryptoCurrency(ETH).currency(USD).build();
         trades.add(tradeWithMaxPrice);
         tradeRepository.saveAll(trades);
     }
@@ -56,7 +59,7 @@ class TradeRepositoryIntegrationTest {
 
     @Test
     void findTopByCryptoCurrencyOrderByPrice() {
-        final Trade trade = tradeRepository.findTopByCryptoCurrencyOrderByPrice("ETH").get();
+        final Trade trade = tradeRepository.findTopByCryptoCurrencyOrderByPrice(ETH).get();
         assertThat(trade.getId())
                 .isEqualTo(tradeWithMinPrice.getId());
         assertThat(trade.getPrice())
@@ -65,7 +68,7 @@ class TradeRepositoryIntegrationTest {
 
     @Test
     void findTopByCryptoCurrencyOrderByPriceDesc() {
-        final Trade trade = tradeRepository.findTopByCryptoCurrencyOrderByPriceDesc("ETH").get();
+        final Trade trade = tradeRepository.findTopByCryptoCurrencyOrderByPriceDesc(ETH).get();
         assertThat(trade.getPrice())
                 .isEqualTo(tradeWithMaxPrice.getPrice());
         assertThat(trade.getId())
@@ -75,7 +78,7 @@ class TradeRepositoryIntegrationTest {
     @Test
     void findByCryptoCurrencyIgnoreCaseOrderByPrice() {
         final List<Trade> tradesList = tradeRepository
-                .findByCryptoCurrencyIgnoreCaseOrderByPrice("ETH", PageRequest.of(0, 2)).get();
+                .findByCryptoCurrencyIgnoreCaseOrderByPrice(ETH, PageRequest.of(0, 2)).get();
         assertThat(tradesList.get(0).getPrice()).isEqualTo(MIN_PRICE);
         assertThat(tradesList.get(1).getPrice()).isEqualTo(AVG_PRICE);
         assertThat(tradesList.size()).isEqualTo(2);
