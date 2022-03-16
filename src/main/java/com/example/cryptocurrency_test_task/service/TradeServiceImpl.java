@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
 @Service
@@ -27,8 +27,7 @@ public class TradeServiceImpl implements TradeService {
 
     @Override
     public Trade findTradeWithMinPriceByCryptoCurrency(String cryptoCurrency) {
-        return tradeRepository
-                .findTopByCryptoCurrencyOrderByPrice(cryptoCurrency)
+        return tradeRepository.findTopByCryptoCurrencyOrderByPrice(cryptoCurrency)
                 .orElseThrow(getNotSupportedCurrencyExceptionSupplier(cryptoCurrency));
     }
 
@@ -69,7 +68,11 @@ public class TradeServiceImpl implements TradeService {
     }
 
     private Supplier<NotSupportedCurrencyException> getNotSupportedCurrencyExceptionSupplier(String cryptoCurrency) {
-        return () -> new NotSupportedCurrencyException("Crypto currency " + cryptoCurrency +
-                " is not supported. " + "Please use: 'BTC', 'ETH', 'XRP'.");
+        return () -> {
+            log.error("ERROR " + LocalDateTime.now() + " Crypto currency " + cryptoCurrency +
+                    " is not supported. " + "Please use: 'BTC', 'ETH', 'XRP'.");
+            throw new NotSupportedCurrencyException("Crypto currency " + cryptoCurrency +
+                    " is not supported. " + "Please use: 'BTC', 'ETH', 'XRP'.");
+        };
     }
 }
